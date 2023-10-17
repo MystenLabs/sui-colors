@@ -3,6 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@mysten/dapp-kit': 0.4.0
   '@mysten/sui.js': 0.44.0
+  '@mysten/wallet-kit': ^0.8.0
   '@radix-ui/colors': ^3.0.0
   '@radix-ui/react-icons': ^1.3.0
   '@radix-ui/themes': ^2.0.0
@@ -25,6 +26,7 @@ specifiers:
 dependencies:
   '@mysten/dapp-kit': 0.4.0_74fd5jqbgvosd4td3aard5imvy
   '@mysten/sui.js': 0.44.0
+  '@mysten/wallet-kit': 0.8.0_biqbaboplfbrettd7655fr4n2y
   '@radix-ui/colors': 3.0.0
   '@radix-ui/react-icons': 1.3.0_react@18.2.0
   '@radix-ui/themes': 2.0.0_pipvdqpnkok7tsr4kdirij3tbu
@@ -327,6 +329,18 @@ packages:
     resolution: {integrity: sha512-OfX7E2oUDYxtBvsuS4e/jSn4Q9Qb6DzgeYtsAdkPZ47znpoNsMgZw0+tVijiv3uGNR6dgNlty6r9rzIzHjtd/A==}
     dev: false
 
+  /@headlessui/react/1.7.17_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-4am+tzvkqDSSgiwrsEpGWqgGo9dz8qU5M3znCkC4PgkpY4HcCZzEDEvozltGGGHIKl9jbXbZPSH5TWn4sWJdow==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      react: ^16 || ^17 || ^18
+      react-dom: ^16 || ^17 || ^18
+    dependencies:
+      client-only: 0.0.1
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
+
   /@humanwhocodes/config-array/0.11.11:
     resolution: {integrity: sha512-N2brEuAadi0CcdeMXUkhbZB84eskAc8MEX1By6qEchoVywSgXPIjou4rYsl0V3Hj0ZnuGycGCjdNgockbzeWNA==}
     engines: {node: '>=10.10.0'}
@@ -395,6 +409,36 @@ packages:
       events: 3.3.0
       superstruct: 1.0.3
       tweetnacl: 1.0.3
+    transitivePeerDependencies:
+      - bufferutil
+      - encoding
+      - utf-8-validate
+    dev: false
+
+  /@mysten/wallet-kit-core/0.6.8:
+    resolution: {integrity: sha512-hbzm9qcP+kVbzm7Q/rSpYo+R3WdE3C4FMMiuykR1kCBI3vdW1yXQrjUrQ3V2yl58Xi8kW++aZXld/g7Fy4w7lw==}
+    dependencies:
+      '@mysten/sui.js': 0.44.0
+      '@mysten/wallet-standard': 0.8.5
+    transitivePeerDependencies:
+      - bufferutil
+      - encoding
+      - utf-8-validate
+    dev: false
+
+  /@mysten/wallet-kit/0.8.0_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-6e3VR5/9wq8VDd5UuoYM5svB1wSEWZXqVhpmdmOn3uwZDYT798hhF1rVn+RC59rLrmcrE6MnByvnKK8j2SdscA==}
+    peerDependencies:
+      react: '*'
+      react-dom: '*'
+    dependencies:
+      '@headlessui/react': 1.7.17_biqbaboplfbrettd7655fr4n2y
+      '@mysten/sui.js': 0.44.0
+      '@mysten/wallet-kit-core': 0.6.8
+      '@mysten/wallet-standard': 0.8.5
+      '@stitches/react': 1.2.8_react@18.2.0
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
     transitivePeerDependencies:
       - bufferutil
       - encoding
@@ -1572,6 +1616,14 @@ packages:
       '@scure/base': 1.1.3
     dev: false
 
+  /@stitches/react/1.2.8_react@18.2.0:
+    resolution: {integrity: sha512-9g9dWI4gsSVe8bNLlb+lMkBYsnIKCZTmvqvDG+Avnn69XfmHZKiaMrx7cgTaddq7aTPPmXiTsbFcUy0xgI4+wA==}
+    peerDependencies:
+      react: '>= 16.3.0'
+    dependencies:
+      react: 18.2.0
+    dev: false
+
   /@suchipi/femver/1.0.0:
     resolution: {integrity: sha512-bprE8+K5V+DPX7q2e2K57ImqNBdfGHDIWaGI5xHxZoxbKOuQZn4wzPiUxOAHnsUr3w3xHrWXwN7gnG/iIuEMIg==}
     dev: false
@@ -2055,6 +2107,10 @@ packages:
 
   /classnames/2.3.2:
     resolution: {integrity: sha512-CSbhY4cFEJRe6/GQzIk5qXZ4Jeg5pcsP7b5peFSDpffpe1cqjASH/n9UTjBwOp6XpMSTwQ8Za2K5V02ueA7Tmw==}
+    dev: false
+
+  /client-only/0.0.1:
+    resolution: {integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==}
     dev: false
 
   /clsx/2.0.0:
