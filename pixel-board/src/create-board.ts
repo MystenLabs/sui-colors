@@ -17,10 +17,11 @@ const packageId = process.env.PACKAGE_ID;
 let transactionBlock = new TransactionBlock();
 
 transactionBlock.moveCall({
-  target: `${packageId}::pixel_board::new`,
+  target: `${packageId}::board::create_board`,
+  arguments: [transactionBlock.pure(100)],
 });
 
-transactionBlock.setGasBudget(10000000);
+transactionBlock.setGasBudget(50000000000);
 client
   .signAndExecuteTransactionBlock({
     transactionBlock,

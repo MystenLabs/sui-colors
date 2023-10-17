@@ -6,27 +6,33 @@ module pixel_board::board {
     use sui::transfer;
     use sui::tx_context::TxContext;
     use std::vector;
-    use std::string::String;
-
-    use pixel_board::pixel::Pixel;
+    use std::string::{String, utf8};
 
     struct Board has key { 
         id: UID,
         dimension_x: u64,
         dimension_y: u64,
-        pixels: vector<vector<Pixel>>
+        pixels: vector<vector<String>>
     }
 
     public fun create_board(
         dimension: u64,
         ctx: &mut TxContext
     ) {
-        let pixels = vector::empty<vector<Pixel>>();
+        let pixels = vector::empty<vector<String>>();
         let i = 0;
-        let loops = 10;
+        let loops = 100;
 
         while (i < loops) {
-            vector::insert(&mut pixels, vector::empty<Pixel>(), i);
+            let tmp_vec = vector::empty<String>();
+
+            let j = 0;
+            while (j < loops) {
+                vector::insert(&mut tmp_vec, utf8(b"ffffff"), j);
+                j = j + 1;
+            };
+
+            vector::insert(&mut pixels, tmp_vec, i);
             i = i + 1;
         };
 
@@ -47,7 +53,7 @@ module pixel_board::board {
         color: String
     ) {
         let mut_vector = vector::borrow_mut(&mut self.pixels, x);
-        pixel_board::pixel::update_color(vector::borrow_mut(mut_vector, y), color);
+        *vector::borrow_mut(mut_vector, y) = color;
     }
 
 }
