@@ -17,14 +17,16 @@ const packageId = process.env.PACKAGE_ID;
 let transactionBlock = new TransactionBlock();
 
 transactionBlock.moveCall({
-  target: `${packageId}::board::add_or_update_board`,
+  target: `${packageId}::board::batch_update_board`,
   arguments: [
     transactionBlock.object(
-      "0x5454237f232a31874fc5fd2d2128d46cd43f12146b7af2ccc6615e16e56409c0"
+      "0x8f2aee48cb04aaf7987eb40699fd2504722607de924d3132bb3dad8ad3c77ab3"
     ),
     transactionBlock.pure(0),
-    transactionBlock.pure(0),
-    transactionBlock.pure("000000"),
+    transactionBlock.pure(2),
+    transactionBlock.pure(1),
+    transactionBlock.pure(20),
+    transactionBlock.pure("ffffff"),
   ],
 });
 
