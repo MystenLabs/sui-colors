@@ -1,45 +1,53 @@
 import React, { useState } from "react";
 import { Button, Container } from "@radix-ui/themes";
 import { HexColorPicker } from "react-colorful";
+import { TransactionBlock } from "@mysten/sui.js/transactions";
 import {
   useSignAndExecuteTransactionBlock,
-  useCurrentAccount,
   useSuiClientQuery,
 } from "@mysten/dapp-kit";
 import ColorGrid from "./ColorGrid";
 
-// {currentAccount && (
-//     <>
-//         <div>
-//             <button
-//                 onClick={() => {
-//                     signAndExecuteTransactionBlock(
-//                         {
-//                             transactionBlock: new TransactionBlock(),
-//                             chain: 'sui:devnet',
-//                         },
-//                         {
-//                             onSuccess: (result) => {
-//                                 console.log('executed transaction block', result);
-//                                 setDigest(result.digest);
-//                             },
-//                         },
-//                     );
-//                 }}
-//             >
-//                 Sign and execute transaction block
-//             </button>
-//         </div>
-
 const Canvas: React.FC = () => {
-  //   const initialCanvas = Array.from({ length: 100 }, () =>
-  //     Array(100).fill("#ffffff"),
-  //   );
-
   const [color, setColor] = useState("#aabbcc");
   const { mutate: signAndExecuteTransactionBlock } =
     useSignAndExecuteTransactionBlock();
-  const currentAccount = useCurrentAccount();
+  //   const currentAccount = useCurrentAccount();
+
+  const handleSubmitColors = async () => {
+    // todo fill in programmable txn block here
+    // const delta = getDelta(stringArray, gridColors);
+    let transactionBlock = new TransactionBlock();
+    console.log(color);
+    transactionBlock.moveCall({
+      target: `0x24ddd1885289fef34b2c7c5516bce3e684519edbb9383476a033cb8252e5fda7::board::add_or_update_board`,
+      arguments: [
+        transactionBlock.object(
+          "0x5454237f232a31874fc5fd2d2128d46cd43f12146b7af2ccc6615e16e56409c0",
+        ),
+        transactionBlock.pure(0),
+        transactionBlock.pure(0),
+        transactionBlock.pure(color.slice(1, 6)),
+      ],
+    });
+
+    signAndExecuteTransactionBlock(
+      {
+        transactionBlock,
+        chain: "sui:testnet",
+      },
+      {
+        onSuccess: (res) => {
+          console.log(res);
+        },
+        onError: (err) => {
+          console.log(err);
+        },
+      },
+    );
+
+    // console.log(delta);
+  };
 
   const id: string =
     "0x5454237f232a31874fc5fd2d2128d46cd43f12146b7af2ccc6615e16e56409c0";
@@ -58,10 +66,19 @@ const Canvas: React.FC = () => {
 
   if (!data.data) return <div>Not found</div>;
 
-  const initialCanvas = data.data?.content?.fields?.pixels;
-  //   const initialCanvas: string[][] = data.data?.content?.fields?.pixels;
+  const dataObject = data.data?.content?.fields?.pixels;
 
-  const [gridColors, setGridColors] = useState<string[][]>(initialCanvas);
+  const stringArray: string[][] = dataObject.map((row) =>
+    row.map((color: string) => "#" + color.toString()),
+  );
+
+  console.log(stringArray);
+
+  //   const whiteSquares = Array.from({ length: 100 }, () =>
+  //     Array(100).fill("#ffffff"),
+  //   );
+
+  const [gridColors, setGridColors] = useState<string[][]>(stringArray);
 
   const getDelta = (initial: string[][], grid: string[][]) => {
     const deltaIndices: [number, number][] = [];
@@ -75,12 +92,6 @@ const Canvas: React.FC = () => {
     }
 
     return deltaIndices;
-  };
-
-  const handleSubmitColors = () => {
-    // todo fill in programmable txn block here
-    const delta = getDelta(initialCanvas, gridColors);
-    console.log(delta);
   };
 
   return (
