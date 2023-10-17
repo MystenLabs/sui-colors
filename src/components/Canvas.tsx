@@ -23,6 +23,14 @@ const Canvas: React.FC = () => {
   const [gridColors, setGridColors] = useState<string[][]>([]);
 
   useEffect(() => {
+    const interval = setInterval(() => {
+      refetch();
+      console.log(interval);
+    }, 2000);
+    return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+  }, []);
+
+  useEffect(() => {
     if (!isLoading && !error && data?.data) {
       const currentCanvas = getArrayFields(data.data);
       if (currentCanvas) {
@@ -30,6 +38,10 @@ const Canvas: React.FC = () => {
       }
     }
   }, [data, isLoading, error]);
+
+  //   useEffect(() => {
+  //     setLocalState(gridColors);
+  //   }, []);
 
   const handleSubmitColors = async () => {
     const original_canvas = getArrayFields(data!.data!);
@@ -88,7 +100,6 @@ const Canvas: React.FC = () => {
     <div>
       <Container>
         <HexColorPicker color={color} onChange={setColor} />
-        {/* <div>{getArrayFields(data.data)}</div> */}
         <Button onClick={handleSubmitColors}> Submit Txn </Button>
         <ColorGrid
           colors={gridColors}
