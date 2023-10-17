@@ -1,35 +1,54 @@
-import React, { useState } from "react";
-import { Button, Container } from "@radix-ui/themes";
+import React, { useState, useEffect } from "react";
+import { Button, Container, Text } from "@radix-ui/themes";
 import { HexColorPicker } from "react-colorful";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 import {
   useSignAndExecuteTransactionBlock,
-  useSuiClientQuery,
+  useSuiClient,
 } from "@mysten/dapp-kit";
 import ColorGrid from "./ColorGrid";
+import { useGetCanvas } from "../useGetCanvas";
+import { SuiObjectData } from "@mysten/sui.js/client";
 
 const Canvas: React.FC = () => {
+  const client = useSuiClient();
+
   const [color, setColor] = useState("#aabbcc");
   const { mutate: signAndExecuteTransactionBlock } =
     useSignAndExecuteTransactionBlock();
-  //   const currentAccount = useCurrentAccount();
+
+  const { handleGetCanvas } = useGetCanvas();
+  const { data, isLoading, error, refetch } = handleGetCanvas();
+
+  const [gridColors, setGridColors] = useState<string[][]>([]);
+
+  useEffect(() => {
+    if (!isLoading && !error && data?.data?.content?.fields?.pixels) {
+      const currentCanvas = getArrayFields(data.data);
+      setGridColors(currentCanvas);
+    }
+  }, [data, isLoading, error]);
 
   const handleSubmitColors = async () => {
     // todo fill in programmable txn block here
-    // const delta = getDelta(stringArray, gridColors);
+    const original_canvas = getArrayFields(data.data)!;
+    const deltas = getDelta(original_canvas, gridColors);
+
     let transactionBlock = new TransactionBlock();
-    console.log(color);
-    transactionBlock.moveCall({
-      target: `0x24ddd1885289fef34b2c7c5516bce3e684519edbb9383476a033cb8252e5fda7::board::add_or_update_board`,
-      arguments: [
-        transactionBlock.object(
-          "0x5454237f232a31874fc5fd2d2128d46cd43f12146b7af2ccc6615e16e56409c0",
-        ),
-        transactionBlock.pure(0),
-        transactionBlock.pure(0),
-        transactionBlock.pure(color.slice(1, 6)),
-      ],
-    });
+    for (const idx in deltas) {
+      console.log(deltas[idx]);
+      transactionBlock.moveCall({
+        target: `0x24ddd1885289fef34b2c7c5516bce3e684519edbb9383476a033cb8252e5fda7::board::add_or_update_board`,
+        arguments: [
+          transactionBlock.object(
+            "0x5454237f232a31874fc5fd2d2128d46cd43f12146b7af2ccc6615e16e56409c0",
+          ),
+          transactionBlock.pure(deltas[idx][0]),
+          transactionBlock.pure(deltas[idx][1]),
+          transactionBlock.pure(color.slice(1, 7)),
+        ],
+      });
+    }
 
     signAndExecuteTransactionBlock(
       {
@@ -37,8 +56,10 @@ const Canvas: React.FC = () => {
         chain: "sui:testnet",
       },
       {
-        onSuccess: (res) => {
-          console.log(res);
+        onSuccess: (tx) => {
+          client.waitForTransactionBlock({ digest: tx.digest }).then(() => {
+            refetch();
+          });
         },
         onError: (err) => {
           console.log(err);
@@ -49,36 +70,11 @@ const Canvas: React.FC = () => {
     // console.log(delta);
   };
 
-  const id: string =
-    "0x5454237f232a31874fc5fd2d2128d46cd43f12146b7af2ccc6615e16e56409c0";
-
-  const { data, isLoading, error, refetch } = useSuiClientQuery("getObject", {
-    id,
-    options: {
-      showContent: true,
-      showOwner: true,
-    },
-  });
-
-  if (isLoading) return <div>Loading...</div>;
-
-  if (error) return <div>Error: {error.message}</div>;
-
-  if (!data.data) return <div>Not found</div>;
-
-  const dataObject = data.data?.content?.fields?.pixels;
-
-  const stringArray: string[][] = dataObject.map((row) =>
-    row.map((color: string) => "#" + color.toString()),
-  );
-
-  console.log(stringArray);
-
   //   const whiteSquares = Array.from({ length: 100 }, () =>
   //     Array(100).fill("#ffffff"),
   //   );
 
-  const [gridColors, setGridColors] = useState<string[][]>(stringArray);
+  //   const [gridColors, setGridColors] = useState<string[][]>(currentCanvas!);
 
   const getDelta = (initial: string[][], grid: string[][]) => {
     const deltaIndices: [number, number][] = [];
@@ -98,6 +94,7 @@ const Canvas: React.FC = () => {
     <div>
       <Container>
         <HexColorPicker color={color} onChange={setColor} />
+        {/* <div>{getArrayFields(data.data)}</div> */}
         <Button onClick={handleSubmitColors}> Submit Txn </Button>
         <ColorGrid
           colors={gridColors}
@@ -109,4 +106,12 @@ const Canvas: React.FC = () => {
   );
 };
 
+function getArrayFields(data: SuiObjectData) {
+  if (data.content?.dataType !== "moveObject") {
+    return null;
+  }
+
+  const { pixels } = data.content.fields as { pixels: Array<Array<string>> };
+  return pixels;
+}
 export default Canvas;
