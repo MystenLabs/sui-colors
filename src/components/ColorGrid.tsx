@@ -29,7 +29,7 @@ const ColorGrid: React.FC<ColorGridProps> = ({
             <div
               key={colIndex}
               style={{
-                backgroundColor: "#" + color,
+                backgroundColor: color,
                 width: "10px",
                 height: "10px",
                 cursor: "pointer",

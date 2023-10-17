@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Container, Text } from "@radix-ui/themes";
+import { Button, Container } from "@radix-ui/themes";
 import { HexColorPicker } from "react-colorful";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 import {
@@ -21,7 +21,7 @@ const Canvas: React.FC = () => {
   const { data, isLoading, error, refetch } = handleGetCanvas();
 
   const [gridColors, setGridColors] = useState<string[][]>([]);
-
+  console.log("parents", gridColors);
   useEffect(() => {
     if (!isLoading && !error && data?.data?.content?.fields?.pixels) {
       const currentCanvas = getArrayFields(data.data);
@@ -38,10 +38,10 @@ const Canvas: React.FC = () => {
     for (const idx in deltas) {
       console.log(deltas[idx]);
       transactionBlock.moveCall({
-        target: `0x24ddd1885289fef34b2c7c5516bce3e684519edbb9383476a033cb8252e5fda7::board::add_or_update_board`,
+        target: `0x3c5f9f43eccf2648855c6febf1143966d87541d47775b2b90c03f875da03cc71::board::update_single_pixel`,
         arguments: [
           transactionBlock.object(
-            "0x5454237f232a31874fc5fd2d2128d46cd43f12146b7af2ccc6615e16e56409c0",
+            "0xe3390ae6a360a076b708691b2a1c24981b931e009cbf4aa6531e559c93d1f28c",
           ),
           transactionBlock.pure(deltas[idx][0]),
           transactionBlock.pure(deltas[idx][1]),
@@ -57,6 +57,7 @@ const Canvas: React.FC = () => {
       },
       {
         onSuccess: (tx) => {
+          console.log(tx);
           client.waitForTransactionBlock({ digest: tx.digest }).then(() => {
             refetch();
           });
@@ -66,15 +67,7 @@ const Canvas: React.FC = () => {
         },
       },
     );
-
-    // console.log(delta);
   };
-
-  //   const whiteSquares = Array.from({ length: 100 }, () =>
-  //     Array(100).fill("#ffffff"),
-  //   );
-
-  //   const [gridColors, setGridColors] = useState<string[][]>(currentCanvas!);
 
   const getDelta = (initial: string[][], grid: string[][]) => {
     const deltaIndices: [number, number][] = [];
