@@ -2,6 +2,7 @@ import React from "react";
 
 interface ColorGridProps {
   colors: string[][];
+  localColorGrid: string[][];
   selectedColor: string;
   onColorChange: (x: string[][]) => void;
   onMouseDown: (event: React.MouseEvent) => void;
@@ -13,6 +14,7 @@ interface ColorGridProps {
 const ColorGrid: React.FC<ColorGridProps> = ({
   colors,
   selectedColor,
+  localColorGrid,
   onColorChange,
   onMouseDown,
   onMouseMove,
@@ -36,7 +38,10 @@ const ColorGrid: React.FC<ColorGridProps> = ({
             <div
               key={colIndex}
               style={{
-                backgroundColor: color,
+                backgroundColor:
+                  localColorGrid[rowIndex][colIndex] !== "0"
+                    ? localColorGrid[rowIndex][colIndex]
+                    : color,
                 width: "10px",
                 height: "10px",
                 cursor: isDragging ? "grabbing" : "pointer",

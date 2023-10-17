@@ -21,6 +21,7 @@ const Canvas: React.FC = () => {
   const { data, isLoading, error, refetch } = handleGetCanvas();
 
   const [gridColors, setGridColors] = useState<string[][]>([]);
+  const [localGrid, setLocalGrid] = useState<string[][]>([]);
 
   // Dragging Mouse
   const [isDragging, setIsDragging] = useState(false);
@@ -37,14 +38,12 @@ const Canvas: React.FC = () => {
     colIndex: number,
   ) => {
     if (isDragging) {
-      console.log(isDragging, color);
-
-      const newColors = gridColors.map((row, rIndex) =>
+      const newColors = localGrid.map((row, rIndex) =>
         row.map((old_color, cIndex) =>
           rIndex === rowIndex && cIndex === colIndex ? color : old_color,
         ),
       );
-      setGridColors(newColors);
+      setLocalGrid(newColors);
     }
   };
 
@@ -65,17 +64,20 @@ const Canvas: React.FC = () => {
       const currentCanvas = getArrayFields(data.data);
       if (currentCanvas) {
         setGridColors(currentCanvas);
+        // Create a new grid with the same dimensions as currentCanvas
+        const newLocalGrid = Array.from({ length: currentCanvas.length }, () =>
+          Array(currentCanvas[0].length).fill("0"),
+        );
+        setLocalGrid(newLocalGrid);
       }
     }
   }, [data, isLoading, error]);
 
   const handleSubmitColors = async () => {
-    const original_canvas = getArrayFields(data!.data!);
-    const deltas = getDelta(original_canvas, gridColors);
+    const deltas = getLocalDelta(localGrid);
 
     let transactionBlock = new TransactionBlock();
     for (const idx in deltas) {
-      console.log(deltas[idx]);
       transactionBlock.moveCall({
         target: `0x3c5f9f43eccf2648855c6febf1143966d87541d47775b2b90c03f875da03cc71::board::update_single_pixel`,
         arguments: [
@@ -84,7 +86,7 @@ const Canvas: React.FC = () => {
           ),
           transactionBlock.pure(deltas[idx][0]),
           transactionBlock.pure(deltas[idx][1]),
-          transactionBlock.pure(color),
+          transactionBlock.pure(localGrid[deltas[idx][0]][deltas[idx][1]]),
         ],
       });
     }
@@ -108,20 +110,32 @@ const Canvas: React.FC = () => {
     );
   };
 
-  const getDelta = (initial: string[][], grid: string[][]) => {
+  const getLocalDelta = (localState: string[][]) => {
     const deltaIndices: [number, number][] = [];
-
-    for (let row = 0; row < initial.length; row++) {
-      for (let col = 0; col < initial[row].length; col++) {
-        if (initial[row][col] !== grid[row][col]) {
+    for (let row = 0; row < localState.length; row++) {
+      for (let col = 0; col < localState[row].length; col++) {
+        if (localState[row][col] !== "0") {
           deltaIndices.push([row, col]);
         }
       }
     }
-
     return deltaIndices;
   };
-  console.log(gridColors);
+
+  //   const getDelta = (initial: string[][], grid: string[][]) => {
+  //     const deltaIndices: [number, number][] = [];
+
+  //     for (let row = 0; row < initial.length; row++) {
+  //       for (let col = 0; col < initial[row].length; col++) {
+  //         if (initial[row][col] !== grid[row][col]) {
+  //           deltaIndices.push([row, col]);
+  //         }
+  //       }
+  //     }
+
+  //     return deltaIndices;
+  //   };
+
   return (
     <div>
       <Container>
@@ -130,7 +144,8 @@ const Canvas: React.FC = () => {
         <ColorGrid
           colors={gridColors}
           selectedColor={color}
-          onColorChange={setGridColors}
+          localColorGrid={localGrid}
+          onColorChange={setLocalGrid}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
