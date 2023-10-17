@@ -22,17 +22,17 @@ const Canvas: React.FC = () => {
 
   const [gridColors, setGridColors] = useState<string[][]>([]);
 
-  console.log("parents", gridColors);
   useEffect(() => {
-    if (!isLoading && !error && data?.data?.content?.fields?.pixels) {
+    if (!isLoading && !error && data?.data) {
       const currentCanvas = getArrayFields(data.data);
-      setGridColors(currentCanvas);
+      if (currentCanvas) {
+        setGridColors(currentCanvas);
+      }
     }
   }, [data, isLoading, error]);
 
   const handleSubmitColors = async () => {
-    // todo fill in programmable txn block here
-    const original_canvas = getArrayFields(data.data)!;
+    const original_canvas = getArrayFields(data!.data!);
     const deltas = getDelta(original_canvas, gridColors);
 
     let transactionBlock = new TransactionBlock();
@@ -102,7 +102,7 @@ const Canvas: React.FC = () => {
 
 function getArrayFields(data: SuiObjectData) {
   if (data.content?.dataType !== "moveObject") {
-    return null;
+    throw new Error("Content not found");
   }
 
   const { pixels } = data.content.fields as { pixels: Array<Array<string>> };
