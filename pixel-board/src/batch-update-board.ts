@@ -20,7 +20,7 @@ transactionBlock.moveCall({
   target: `${packageId}::board::batch_update_board`,
   arguments: [
     transactionBlock.object(
-      "0x8f2aee48cb04aaf7987eb40699fd2504722607de924d3132bb3dad8ad3c77ab3"
+      "0xdd118df8a84b5a9e0b4024b3d848c06ab46fc2c17a58cbed616f15a7938ab5db"
     ),
     transactionBlock.pure(0),
     transactionBlock.pure(2),
