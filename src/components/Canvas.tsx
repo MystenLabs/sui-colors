@@ -21,6 +21,7 @@ const Canvas: React.FC = () => {
   const { data, isLoading, error, refetch } = handleGetCanvas();
 
   const [gridColors, setGridColors] = useState<string[][]>([]);
+
   console.log("parents", gridColors);
   useEffect(() => {
     if (!isLoading && !error && data?.data?.content?.fields?.pixels) {
