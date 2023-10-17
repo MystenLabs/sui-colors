@@ -4,15 +4,22 @@ interface ColorGridProps {
   colors: string[][];
   selectedColor: string;
   onColorChange: (x: string[][]) => void;
+  onMouseDown: (event: React.MouseEvent) => void;
+  onMouseMove: (event: React.MouseEvent, x: number, y: number) => void;
+  onMouseUp: () => void;
+  isDragging: boolean;
 }
 
 const ColorGrid: React.FC<ColorGridProps> = ({
   colors,
   selectedColor,
   onColorChange,
+  onMouseDown,
+  onMouseMove,
+  onMouseUp,
+  isDragging,
 }) => {
   const handleSquareClick = (rowIndex: number, colIndex: number) => {
-    console.log(rowIndex, colIndex, selectedColor);
     const newColors = colors.map((row, rIndex) =>
       row.map((color, cIndex) =>
         rIndex === rowIndex && cIndex === colIndex ? selectedColor : color,
@@ -32,9 +39,12 @@ const ColorGrid: React.FC<ColorGridProps> = ({
                 backgroundColor: color,
                 width: "10px",
                 height: "10px",
-                cursor: "pointer",
+                cursor: isDragging ? "grabbing" : "pointer",
               }}
               onClick={() => handleSquareClick(rowIndex, colIndex)}
+              onMouseDown={onMouseDown}
+              onMouseMove={(e) => onMouseMove(e, rowIndex, colIndex)}
+              onMouseUp={onMouseUp}
             ></div>
           ))}
         </div>

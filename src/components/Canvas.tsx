@@ -22,12 +22,42 @@ const Canvas: React.FC = () => {
 
   const [gridColors, setGridColors] = useState<string[][]>([]);
 
+  // Dragging Mouse
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleMouseDown = (_e: React.MouseEvent) => {
+    if (!isDragging) {
+      setIsDragging(true);
+    }
+  };
+
+  const handleMouseMove = (
+    _e: React.MouseEvent,
+    rowIndex: number,
+    colIndex: number,
+  ) => {
+    if (isDragging) {
+      console.log(isDragging, color);
+
+      const newColors = gridColors.map((row, rIndex) =>
+        row.map((old_color, cIndex) =>
+          rIndex === rowIndex && cIndex === colIndex ? color : old_color,
+        ),
+      );
+      setGridColors(newColors);
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
   useEffect(() => {
     const interval = setInterval(() => {
       refetch();
       console.log(interval);
     }, 2000);
-    return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -38,10 +68,6 @@ const Canvas: React.FC = () => {
       }
     }
   }, [data, isLoading, error]);
-
-  //   useEffect(() => {
-  //     setLocalState(gridColors);
-  //   }, []);
 
   const handleSubmitColors = async () => {
     const original_canvas = getArrayFields(data!.data!);
@@ -95,7 +121,7 @@ const Canvas: React.FC = () => {
 
     return deltaIndices;
   };
-
+  console.log(gridColors);
   return (
     <div>
       <Container>
@@ -105,6 +131,11 @@ const Canvas: React.FC = () => {
           colors={gridColors}
           selectedColor={color}
           onColorChange={setGridColors}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          //   selectedArea={selectedArea}
+          isDragging={isDragging}
         />
       </Container>
     </div>
