@@ -4,6 +4,7 @@ import { HexColorPicker } from "react-colorful";
 import {
   useSignAndExecuteTransactionBlock,
   useCurrentAccount,
+  useSuiClientQuery,
 } from "@mysten/dapp-kit";
 import ColorGrid from "./ColorGrid";
 
@@ -31,15 +32,36 @@ import ColorGrid from "./ColorGrid";
 //         </div>
 
 const Canvas: React.FC = () => {
-  const initialCanvas = Array.from({ length: 100 }, () =>
-    Array(100).fill("#ffffff"),
-  );
+  //   const initialCanvas = Array.from({ length: 100 }, () =>
+  //     Array(100).fill("#ffffff"),
+  //   );
 
   const [color, setColor] = useState("#aabbcc");
-  const [gridColors, setGridColors] = useState<string[][]>(initialCanvas);
   const { mutate: signAndExecuteTransactionBlock } =
     useSignAndExecuteTransactionBlock();
   const currentAccount = useCurrentAccount();
+
+  const id: string =
+    "0x5454237f232a31874fc5fd2d2128d46cd43f12146b7af2ccc6615e16e56409c0";
+
+  const { data, isLoading, error, refetch } = useSuiClientQuery("getObject", {
+    id,
+    options: {
+      showContent: true,
+      showOwner: true,
+    },
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+
+  if (error) return <div>Error: {error.message}</div>;
+
+  if (!data.data) return <div>Not found</div>;
+
+  const initialCanvas = data.data?.content?.fields?.pixels;
+  //   const initialCanvas: string[][] = data.data?.content?.fields?.pixels;
+
+  const [gridColors, setGridColors] = useState<string[][]>(initialCanvas);
 
   const getDelta = (initial: string[][], grid: string[][]) => {
     const deltaIndices: [number, number][] = [];

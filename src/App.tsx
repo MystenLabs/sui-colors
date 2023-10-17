@@ -1,6 +1,5 @@
 import { ConnectButton } from "@mysten/dapp-kit";
 import { Box, Container, Flex, Heading } from "@radix-ui/themes";
-import { WalletStatus } from "./WalletStatus";
 import Canvas from "./components/Canvas";
 
 function App() {
