@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { HexColorPicker } from "react-colorful";
+import React from "react";
 
 interface ColorGridProps {
   colors: string[][];
@@ -12,8 +11,6 @@ const ColorGrid: React.FC<ColorGridProps> = ({
   selectedColor,
   onColorChange,
 }) => {
-  // const [currColor, setSelectedColor] = useState<string | null>(selectedColor);
-
   const handleSquareClick = (rowIndex: number, colIndex: number) => {
     console.log(rowIndex, colIndex, selectedColor);
     const newColors = colors.map((row, rIndex) =>
@@ -35,11 +32,7 @@ const ColorGrid: React.FC<ColorGridProps> = ({
                 backgroundColor: color,
                 width: "10px",
                 height: "10px",
-                // margin: "1px",
                 cursor: "pointer",
-                // border: `1px solid ${
-                //   color === selectedColor ? "black" : "transparent"
-                // }`,
               }}
               onClick={() => handleSquareClick(rowIndex, colIndex)}
             ></div>
