@@ -46,7 +46,7 @@ const Canvas: React.FC = () => {
           ),
           transactionBlock.pure(deltas[idx][0]),
           transactionBlock.pure(deltas[idx][1]),
-          transactionBlock.pure(color.slice(1, 7)),
+          transactionBlock.pure(color),
         ],
       });
     }
