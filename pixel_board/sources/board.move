@@ -31,7 +31,7 @@ module pixel_board::board {
 
             let j = 0; // Initialize another loop counter j
             while (j < loops) { // Loop from 0 to 99
-                vector::insert(&mut tmp_vec, utf8(b"ffffff"), j); // Insert a string representing white color ("ffffff") at index j in tmp_vec
+                vector::insert(&mut tmp_vec, utf8(b"#ffffff"), j); // Insert a string representing white color ("ffffff") at index j in tmp_vec
                 j = j + 1; // Increment j by 1
             };
 
