@@ -16,7 +16,6 @@ module pixel_board::pixel {
     public fun new(): Pixel {
         // Create and return a new Pixel struct with the given fields
         Pixel {
-            // id: object::new(ctx),
             color: utf8(b"ffffff")
         }
     }

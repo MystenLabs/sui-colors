@@ -6,6 +6,7 @@ module pixel_board::board {
     use sui::transfer;
     use sui::tx_context::TxContext;
     use std::vector;
+    use std::string::String;
 
     use pixel_board::pixel::Pixel;
 
@@ -43,11 +44,10 @@ module pixel_board::board {
         self: &mut Board,
         x: u64,
         y: u64,
-        pixel: Pixel,
-        _ctx: &mut TxContext
+        color: String
     ) {
         let mut_vector = vector::borrow_mut(&mut self.pixels, x);
-        *vector::borrow_mut(mut_vector, y) = pixel;
+        pixel_board::pixel::update_color(vector::borrow_mut(mut_vector, y), color);
     }
 
 }
