@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {Button, Container, Flex, RadioGroup, Text} from "@radix-ui/themes";
+import { Button, Container, Flex, RadioGroup, Text } from "@radix-ui/themes";
 import { HexColorPicker } from "react-colorful";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 import {
@@ -11,18 +11,22 @@ import { useGetCanvas } from "../useGetCanvas";
 import { SuiObjectData } from "@mysten/sui.js/client";
 
 const cursorSizes = {
-    Small: 1,
-    Medium: 2,
-    Large: 3,
-}
+  Small: 1,
+  Medium: 2,
+  Large: 3,
+};
 
 enum CursorSizes {
-    Small = 'Small',
-    Medium = 'Medium',
-    Large = 'Large',
+  Small = "Small",
+  Medium = "Medium",
+  Large = "Large",
 }
 
-const cursorSelection: CursorSizes[] = [CursorSizes.Small, CursorSizes.Medium, CursorSizes.Large];
+const cursorSelection: CursorSizes[] = [
+  CursorSizes.Small,
+  CursorSizes.Medium,
+  CursorSizes.Large,
+];
 
 function getCoords(size: CursorSizes, [x, y]: [number, number]) {
   if (size === CursorSizes.Small) {
@@ -32,7 +36,7 @@ function getCoords(size: CursorSizes, [x, y]: [number, number]) {
   const sizeToNum = cursorSizes[size];
 
   const coords = [];
-  const gridSize = sizeToNum * 2 - 1
+  const gridSize = sizeToNum * 2 - 1;
   const halfGridSize = Math.floor(gridSize / 2);
 
   for (let i = -halfGridSize; i <= halfGridSize; i++) {
@@ -58,6 +62,7 @@ const Canvas: React.FC = () => {
 
   const [gridColors, setGridColors] = useState<string[][]>([]);
   const [localGrid, setLocalGrid] = useState<string[][]>([]);
+  const [length, setLength] = useState<number>(0);
 
   // Dragging Mouse
   const [isDragging, setIsDragging] = useState(false);
@@ -69,7 +74,7 @@ const Canvas: React.FC = () => {
   ) => {
     if (isDragging) {
       const coords = getCoords(cursorSize, [rowIndex, colIndex]);
-      const newColors = []
+      const newColors = [];
       for (let row = 0; row < localGrid.length; row++) {
         newColors.push(localGrid[row].slice());
       }
@@ -93,14 +98,18 @@ const Canvas: React.FC = () => {
   useEffect(() => {
     if (!isLoading && !error && data?.data) {
       const currentCanvas = getArrayFields(data.data);
-      if (currentCanvas) {
-        setGridColors(currentCanvas);
-        // Create a new grid with the same dimensions as currentCanvas
-        const newLocalGrid = Array.from({ length: currentCanvas.length }, () =>
-          Array(currentCanvas[0].length).fill("0"),
-        );
+      setGridColors(currentCanvas);
+      if (length !== currentCanvas.length) {
+        setLength(currentCanvas.length);
+        if (currentCanvas) {
+          // Create a new grid with the same dimensions as currentCanvas
+          const newLocalGrid = Array.from(
+            { length: currentCanvas.length },
+            () => Array(currentCanvas[0].length).fill("0"),
+          );
 
-        setLocalGrid(newLocalGrid);
+          setLocalGrid(newLocalGrid);
+        }
       }
     }
   }, [data, isLoading, error]);
@@ -121,7 +130,9 @@ const Canvas: React.FC = () => {
           ),
           transactionBlock.pure(newDeltas[idx][0]),
           transactionBlock.pure(newDeltas[idx][1]),
-          transactionBlock.pure(localGrid[newDeltas[idx][0]][newDeltas[idx][1]]),
+          transactionBlock.pure(
+            localGrid[newDeltas[idx][0]][newDeltas[idx][1]],
+          ),
         ],
       });
     }
@@ -175,28 +186,40 @@ const Canvas: React.FC = () => {
   return (
     <div>
       <Container>
-        <HexColorPicker color={color} onChange={(color) => {
-          setColor(color);
-          setCursorSize(CursorSizes.Small);
-        }} />
+        <HexColorPicker
+          color={color}
+          onChange={(color) => {
+            setColor(color);
+            setCursorSize(CursorSizes.Small);
+          }}
+        />
         <Flex gap="2" direction="row">
           <Button onClick={handleSubmitColors}> Submit Txn </Button>
-          <Button onClick={() => {
-            setColor('#ffffff');
-            setCursorSize(CursorSizes.Medium);
-          }}>Eraser &#9003;</Button>
-          <RadioGroup.Root defaultValue={cursorSize} value={cursorSize} onValueChange={(value) => {
-            setCursorSize(value as CursorSizes);
-          }}>
+          <Button
+            onClick={() => {
+              setColor("#ffffff");
+              setCursorSize(CursorSizes.Medium);
+            }}
+          >
+            Eraser &#9003;
+          </Button>
+          <RadioGroup.Root
+            defaultValue={cursorSize}
+            value={cursorSize}
+            onValueChange={(value) => {
+              setCursorSize(value as CursorSizes);
+            }}
+          >
             <Flex gap="2" direction="column">
-              {cursorSelection.map(cursorSize => {
+              {cursorSelection.map((cursorSize) => {
                 return (
                   <Text as="label" size="2" key={cursorSize}>
                     <Flex gap="2">
                       <RadioGroup.Item value={cursorSize} /> {cursorSize}
                     </Flex>
                   </Text>
-              )})}
+                );
+              })}
             </Flex>
           </RadioGroup.Root>
         </Flex>
